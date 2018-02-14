@@ -1,7 +1,7 @@
 {
-  "name": "web-project-base",
+  "name": "fourier-doodling",
   "version": "1.0.0",
-  "description": "A good starting point for a new web project",
+  "description": "Doodling with Fourier Transforms",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

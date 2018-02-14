@@ -1,3 +1,3 @@
-# web-project-base
+# fourier-doodling
 
-A good starting point for a new web project
+Doodling with Fourier Transforms
