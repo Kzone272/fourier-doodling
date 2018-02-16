@@ -1,0 +1,8 @@
+.playerControls {
+  margin-top: 5px;
+}
+
+.playerControls > button {
+  display: block;
+  margin-bottom: 5px;
+}
