@@ -44,18 +44,18 @@ function drawCircle({ x, y, anchorX, anchorY, radius }) {
   context.beginPath();
   context.arc(x, y, radius, 0, Math.PI * 2, false);
   context.closePath();
-  context.strokeStyle = '#ccc';
+  context.strokeStyle = '#aaa';
   context.stroke();
 
   context.beginPath();
   context.moveTo(x, y);
   context.lineTo(anchorX, anchorY);
-  context.strokeStyle = 'red';
+  context.strokeStyle = '#a55';
   context.stroke();
 }
 
 let t = 0;
-const speed = 0.03;
+const speed = 0.015;
 const startX = 250;
 const startY = 250;
 
