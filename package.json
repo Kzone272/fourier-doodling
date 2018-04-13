@@ -2,6 +2,7 @@
   "name": "fourier-doodling",
   "version": "1.0.0",
   "description": "Doodling with Fourier Transforms",
+  "repository": "github:kzone272/fourier-doodling",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
