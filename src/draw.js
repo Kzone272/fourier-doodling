@@ -1,17 +1,49 @@
 import _ from 'lodash';
 
-const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d');
+const DoodleModel = class {
+  constructor() {
+    this.lineLength = 200;
+    this.speed = 0.015;
+    this.startX = 250;
+    this.startY = 250;
 
-const canvasWidth = canvas.width;
-const canvasHeight = canvas.height;
+    this.reset();
+  }
 
-let circles;
+  reset() {
+    this.circles = [];
+    this.line = [];
+    this.t = 0;
+  }
+
+  tick() {
+    this.processCircles();
+    this.processLine();
+    this.t++;
+  }
+
+  processCircles() {
+    let x = this.startX;
+    let y = this.startY;
+    this.circles.forEach((circle) => {
+      Object.assign(circle, { x, y });
+      x += circle.radius * Math.cos(circle.rotation);
+      y += circle.radius * Math.sin(circle.rotation);
+      Object.assign(circle, { anchorX: x, anchorY: y });
+      circle.rotation = this.t * circle.period * this.speed;
+    });
+  }
+
+  processLine() {
+    const { anchorX: x, anchorY: y } = this.circles[this.circles.length - 1];
+    this.line.push({ x, y });
+    this.line = this.line.slice(-this.lineLength);
+  }
+};
 
 /**
- * Circles
+ * Circle Makers
  */
-
 
 function makeRandomCircles(n) {
   const array = [];
@@ -52,131 +84,111 @@ function generateCircles(n = 5, method = 'random') {
   return _.sortBy(array, 'period');
 }
 
-function drawCircle({ x, y, anchorX, anchorY, radius }) {
-  context.beginPath();
-  context.arc(x, y, radius, 0, Math.PI * 2, false);
-  context.closePath();
-  context.strokeStyle = '#aaa';
-  context.stroke();
+const CanvasRenderer = class {
+  constructor(canvasId, doodleModel) {
+    this.canvas = document.getElementById(canvasId);
+    this.context = this.canvas.getContext('2d');
+    this.doodleModel = doodleModel;
 
-  context.beginPath();
-  context.moveTo(x, y);
-  context.lineTo(anchorX, anchorY);
-  context.strokeStyle = '#a55';
-  context.stroke();
-}
-
-let t = 0;
-const speed = 0.015;
-const startX = 250;
-const startY = 250;
-
-function processCircles() {
-  let x = startX;
-  let y = startY;
-  circles.forEach((circle) => {
-    Object.assign(circle, { x, y });
-    x += circle.radius * Math.cos(circle.rotation);
-    y += circle.radius * Math.sin(circle.rotation);
-    Object.assign(circle, { anchorX: x, anchorY: y });
-    circle.rotation = t * circle.period * speed;
-  });
-}
-
-let line = [];
-const length = 200;
-
-/**
- * Lines
- */
-
-function processLine() {
-  const { anchorX: x, anchorY: y } = circles[circles.length - 1];
-  line.push({ x, y });
-  line = line.slice(-length);
-}
-
-function drawLine() {
-  context.moveTo(line[0].x, line[0].y);
-  context.beginPath();
-  for (let i = 1; i < line.length; i++) {
-    const { x, y } = line[i];
-    context.lineTo(x, y);
+    this.t = 0;
   }
-  context.strokeStyle = 'green';
-  context.stroke();
-}
 
+  drawLine() {
+    this.context.moveTo(this.doodleModel.line[0].x, this.doodleModel.line[0].y);
+    this.context.beginPath();
+    for (let i = 1; i < this.doodleModel.line.length; i++) {
+      const { x, y } = this.doodleModel.line[i];
+      this.context.lineTo(x, y);
+    }
+    this.context.strokeStyle = 'green';
+    this.context.stroke();
+  }
 
-/**
- * Frame Handlers
- */
+  drawCircle({ x, y, anchorX, anchorY, radius }) {
+    this.context.beginPath();
+    this.context.arc(x, y, radius, 0, Math.PI * 2, false);
+    this.context.closePath();
+    this.context.strokeStyle = '#aaa';
+    this.context.stroke();
+
+    this.context.beginPath();
+    this.context.moveTo(x, y);
+    this.context.lineTo(anchorX, anchorY);
+    this.context.strokeStyle = '#a55';
+    this.context.stroke();
+  }
+
+  drawFrame() {
+    this.clearFrame();
+
+    this.doodleModel.circles.forEach((circle) => {
+      this.drawCircle(circle);
+    });
+
+    this.drawLine();
+  }
+
+  clearFrame() {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // color in the background
+    this.context.fillStyle = '#eee';
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+};
+
+const doodleModel = new DoodleModel();
+doodleModel.circles = generateCircles();
+const canvasRenderer = new CanvasRenderer('canvas', doodleModel);
 
 let animationHandle = null;
 
-function clearFrame() {
-  context.clearRect(0, 0, canvasWidth, canvasHeight);
+function requestFrame() {
+  doodleModel.tick();
+  canvasRenderer.drawFrame();
 
-  // color in the background
-  context.fillStyle = '#eee';
-  context.fillRect(0, 0, canvasWidth, canvasHeight);
+  animationHandle = window.requestAnimationFrame(requestFrame);
 }
 
-function drawFrame() {
-  clearFrame();
-
-  processCircles();
-  circles.forEach((circle) => {
-    drawCircle(circle);
-  });
-
-  processLine();
-  drawLine();
-
-  t++;
-
-  animationHandle = window.requestAnimationFrame(drawFrame);
+function cancelFrame() {
+  window.cancelAnimationFrame(animationHandle);
 }
 
 /**
  * Animation Controls
  */
 
-circles = generateCircles();
+const Controls = class {
+  constructor() {
+    this.playing = false;
+  }
 
-const state = {
-  playing: false,
-};
-
-const controls = {
   pause() {
-    if (state.playing) {
-      window.cancelAnimationFrame(animationHandle);
-      state.playing = false;
+    if (this.playing) {
+      cancelFrame();
+      this.playing = false;
     }
-  },
+  }
 
   resume() {
-    if (!state.playing) {
-      drawFrame();
-      state.playing = true;
+    if (!this.playing) {
+      requestFrame();
+      this.playing = true;
     }
-  },
+  }
 
   restart() {
     this.pause();
 
-    t = 0;
-    processCircles();
-    line = [];
+    doodleModel.reset();
 
     this.resume();
-  },
+  }
 
   randomize() {
-    circles = generateCircles(5, 'random');
+    doodleModel.circles = generateCircles(5, 'random');
     this.restart();
-  },
+  }
 };
 
-export default controls;
+export default Controls;

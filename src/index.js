@@ -1,5 +1,7 @@
 import $ from 'jquery';
-import controls from './draw';
+import Controls from './draw';
+
+const controls = new Controls();
 
 const $resume = $('#resume').hide();
 const $pause = $('#pause');
