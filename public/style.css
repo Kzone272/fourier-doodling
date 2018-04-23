@@ -6,3 +6,9 @@
   display: block;
   margin-bottom: 5px;
 }
+
+.line {
+  stroke-width: 2;
+  stroke: #07f;
+  fill: none
+}

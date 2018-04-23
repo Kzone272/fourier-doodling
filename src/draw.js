@@ -1,45 +1,5 @@
 import _ from 'lodash';
-
-const DoodleModel = class {
-  constructor() {
-    this.lineLength = 200;
-    this.speed = 0.015;
-    this.startX = 250;
-    this.startY = 250;
-
-    this.reset();
-  }
-
-  reset() {
-    this.circles = [];
-    this.line = [];
-    this.t = 0;
-  }
-
-  tick() {
-    this.processCircles();
-    this.processLine();
-    this.t++;
-  }
-
-  processCircles() {
-    let x = this.startX;
-    let y = this.startY;
-    this.circles.forEach((circle) => {
-      Object.assign(circle, { x, y });
-      x += circle.radius * Math.cos(circle.rotation);
-      y += circle.radius * Math.sin(circle.rotation);
-      Object.assign(circle, { anchorX: x, anchorY: y });
-      circle.rotation = this.t * circle.period * this.speed;
-    });
-  }
-
-  processLine() {
-    const { anchorX: x, anchorY: y } = this.circles[this.circles.length - 1];
-    this.line.push({ x, y });
-    this.line = this.line.slice(-this.lineLength);
-  }
-};
+import * as d3 from 'd3';
 
 /**
  * Circle Makers
@@ -69,7 +29,19 @@ function makeOrderedCircles(n) {
   return array;
 }
 
-function generateCircles(n = 5, method = 'random') {
+function makeSquareCircles(n) {
+  const array = [];
+  for (let i = 0; i < n; i++) {
+    array.push({
+      radius: 50 / (2 * i + 1),
+      rotation: 0,
+      period: 2 * i + 1,
+    });
+  }
+  return array;
+}
+
+function generateCircles(n = 50, method = 'square') {
   let array = [];
   switch (method) {
     case 'random':
@@ -78,11 +50,69 @@ function generateCircles(n = 5, method = 'random') {
     case 'ordered':
       array = makeOrderedCircles(n);
       break;
+    case 'square':
+      array = makeSquareCircles(n);
+      break;
     default:
       array = [];
   }
   return _.sortBy(array, 'period');
 }
+
+const DoodleModel = class {
+  constructor() {
+    this.maxLineLength = 200;
+    this.speed = 0.015;
+    this.startX = 250;
+    this.startY = 250;
+    this.line = [];
+    this.circles = [];
+
+    this.reset();
+  }
+
+  reset() {
+    // We don't want to replace the arrays themselves
+    // because that will break data binding
+    this.line.length = 0;
+    this.randomizeCircles();
+    this.t = 0;
+  }
+
+  randomizeCircles() {
+    this.circles.length = 0;
+    this.circles.push(...generateCircles());
+  }
+
+  tick() {
+    this.processCircles();
+    this.processLine();
+    this.t++;
+  }
+
+  processCircles() {
+    let x = this.startX;
+    let y = this.startY;
+    this.circles.forEach((circle) => {
+      Object.assign(circle, { x, y });
+      x += circle.radius * Math.cos(circle.rotation);
+      y += circle.radius * Math.sin(circle.rotation);
+      Object.assign(circle, { anchorX: x, anchorY: y });
+      circle.rotation = this.t * circle.period * this.speed;
+    });
+  }
+
+  processLine() {
+    if (!this.circles.length) {
+      return;
+    }
+    const { anchorX: x, anchorY: y } = this.circles[this.circles.length - 1];
+    this.line.push([x, y]);
+    if (this.line.length > this.maxLineLength) {
+      this.line.shift();
+    }
+  }
+};
 
 const CanvasRenderer = class {
   constructor(canvasId, doodleModel) {
@@ -94,12 +124,16 @@ const CanvasRenderer = class {
   }
 
   drawLine() {
-    this.context.moveTo(this.doodleModel.line[0].x, this.doodleModel.line[0].y);
+    if (!this.doodleModel.line.length) {
+      return;
+    }
+    this.context.moveTo(...this.doodleModel.line[0]);
     this.context.beginPath();
     for (let i = 1; i < this.doodleModel.line.length; i++) {
-      const { x, y } = this.doodleModel.line[i];
+      const [x, y] = this.doodleModel.line[i];
       this.context.lineTo(x, y);
     }
+    this.context.lineWidth = 2;
     this.context.strokeStyle = 'green';
     this.context.stroke();
   }
@@ -137,15 +171,67 @@ const CanvasRenderer = class {
   }
 };
 
+const SvgRenderer = class {
+  constructor(svgId, doodleModel) {
+    this.doodleModel = doodleModel;
+    this.svgContainer = d3.select(svgId);
+    this.totalLength = 0;
+
+    this.lineFunction = d3.line()
+      .x(d => d[0])
+      .y(d => d[1])
+      .curve(d3.curveCatmullRom.alpha(0.5));
+
+    this.linePath = this.svgContainer
+      .append('path')
+      .classed('line', true)
+      .datum(this.doodleModel.line)
+      .attr('d', this.lineFunction);
+
+    this.circles = this.svgContainer.selectAll('circle')
+      .data(this.doodleModel.circles);
+
+    this.circles.enter()
+      .append('circle')
+      .classed('circle', true)
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y)
+      .attr('r', d => d.radius);
+
+    this.circles.exit()
+      .remove();
+  }
+
+  drawFrame() {
+    this.drawCircles();
+    this.drawLine();
+  }
+
+  drawCircles() {
+    this.circles
+      .data(this.doodleModel.circles)
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y)
+      .attr('r', d => d.radius);
+  }
+
+  drawLine() {
+    this.linePath
+      .attr('d', this.lineFunction);
+  }
+};
+
 const doodleModel = new DoodleModel();
-doodleModel.circles = generateCircles();
 const canvasRenderer = new CanvasRenderer('canvas', doodleModel);
+const svgRenderer = new SvgRenderer('svg', doodleModel);
 
 let animationHandle = null;
 
 function requestFrame() {
   doodleModel.tick();
+
   canvasRenderer.drawFrame();
+  svgRenderer.drawFrame();
 
   animationHandle = window.requestAnimationFrame(requestFrame);
 }
@@ -186,7 +272,7 @@ const Controls = class {
   }
 
   randomize() {
-    doodleModel.circles = generateCircles(5, 'random');
+    doodleModel.randomizeCircles();
     this.restart();
   }
 };
