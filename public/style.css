@@ -7,8 +7,18 @@
   margin-bottom: 5px;
 }
 
+svg {
+  background-color: #eee;
+}
+
 .line {
   stroke-width: 2;
   stroke: #07f;
   fill: none
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2;
+  stroke: #888;
 }
