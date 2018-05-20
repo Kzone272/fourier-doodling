@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import Controls from './draw';
+import Controls from './Controls';
 
 const controls = new Controls();
 
@@ -7,6 +7,7 @@ const $resume = $('#resume').hide();
 const $pause = $('#pause');
 const $restart = $('#restart');
 const $randomize = $('#randomize');
+const $square = $('#square');
 
 function showResume() {
   $resume.show();
@@ -35,6 +36,11 @@ $restart.click(() => {
 
 $randomize.click(() => {
   controls.randomize();
+  showPause();
+});
+
+$square.click(() => {
+  controls.square();
   showPause();
 });
 

@@ -21,6 +21,6 @@
   "dependencies": {
     "d3": "^5.1.0",
     "jquery": "^3.3.1",
-    "lodash": "^4.17.5"
+    "lodash.sortby": "^4.7.0"
   }
 }
