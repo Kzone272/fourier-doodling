@@ -13,7 +13,6 @@ const DoodleModel = class {
   reset() {
     this.t = 0;
     this.line = [];
-    this.notchPoints = [];
     this.processCircles();
   }
 
@@ -31,15 +30,15 @@ const DoodleModel = class {
   }
 
   processCircles() {
-    this.notchPoints = [];
+    this.notch = [];
     let x = this.startX;
     let y = this.startY;
     this.circles.forEach((circle) => {
       Object.assign(circle, { x, y });
-      this.notchPoints.push([x, y]);
+      this.notch.push([x, y]);
       x += circle.radius * Math.cos(circle.rotation);
       y += circle.radius * Math.sin(circle.rotation);
-      this.notchPoints.push([x, y]);
+      this.notch.push([x, y]);
       Object.assign(circle, { anchorX: x, anchorY: y });
       circle.rotation = this.t * circle.period * this.speed;
     });

@@ -54,7 +54,7 @@ const SvgRenderer = class {
 
   drawNotches() {
     this.notchPath
-      .attr('d', this.notchFunction(this.doodleModel.notchPoints));
+      .attr('d', this.notchFunction(this.doodleModel.notch));
   }
 
   drawLine() {
