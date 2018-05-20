@@ -1,12 +1,10 @@
 import DoodleModel from './DoodleModel';
 import SvgRenderer from './SvgRenderer';
-import CanvasRenderer from './CanvasRenderer';
 import makeCircles from './makeCircles';
 
 const doodleModel = new DoodleModel();
 doodleModel.setCircles(makeCircles('square', 50));
 
-const canvasRenderer = new CanvasRenderer('canvas', doodleModel);
 const svgRenderer = new SvgRenderer('svg', doodleModel);
 
 let animationHandle = null;
@@ -14,7 +12,6 @@ let animationHandle = null;
 function requestFrame() {
   doodleModel.tick();
 
-  canvasRenderer.drawFrame();
   svgRenderer.drawFrame();
 
   animationHandle = window.requestAnimationFrame(requestFrame);

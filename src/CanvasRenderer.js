@@ -1,3 +1,7 @@
+/**
+ * This was the original renderer that is not likely to be used anymore
+ * It's not as pretty as SVG and not as nice to work with as D3
+ */
 
 const CanvasRenderer = class {
   constructor(canvasId, doodleModel) {
