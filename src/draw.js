@@ -12,6 +12,8 @@ function makeRandomCircles(n) {
       radius: 10 * (Math.random() * 3 + 1),
       rotation: 0,
       period: Math.random() * n,
+      x: 0,
+      y: 0,
     });
   }
   return array;
@@ -24,6 +26,8 @@ function makeOrderedCircles(n) {
       radius: 10 * (n + 2 - i),
       rotation: 0,
       period: i + 1,
+      x: 0,
+      y: 0,
     });
   }
   return array;
@@ -36,6 +40,8 @@ function makeSquareCircles(n) {
       radius: 50 / (2 * i + 1),
       rotation: 0,
       period: 2 * i + 1,
+      x: 0,
+      y: 0,
     });
   }
   return array;
@@ -185,18 +191,15 @@ const SvgRenderer = class {
     this.linePath = this.svgContainer
       .append('path')
       .classed('line', true)
-      .datum(this.doodleModel.line)
-      .attr('d', this.lineFunction);
+      .datum(this.doodleModel.line);
 
     this.circles = this.svgContainer.selectAll('circle')
       .data(this.doodleModel.circles);
 
-    this.circles.enter()
+    this.circles = this.circles.enter()
       .append('circle')
       .classed('circle', true)
-      .attr('cx', d => d.x)
-      .attr('cy', d => d.y)
-      .attr('r', d => d.radius);
+      .merge(this.circles);
 
     this.circles.exit()
       .remove();
@@ -209,7 +212,6 @@ const SvgRenderer = class {
 
   drawCircles() {
     this.circles
-      .data(this.doodleModel.circles)
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
       .attr('r', d => d.radius);
