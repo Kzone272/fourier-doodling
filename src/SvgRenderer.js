@@ -30,13 +30,13 @@ const SvgRenderer = class {
     this.circles = this.svgContainer.selectAll('circle')
       .data(this.doodleModel.circles);
 
+    this.circles.exit()
+      .remove();
+
     this.circles = this.circles.enter()
       .append('circle')
       .classed('circle', true)
       .merge(this.circles);
-
-    this.circles.exit()
-      .remove();
   }
 
   drawFrame() {
