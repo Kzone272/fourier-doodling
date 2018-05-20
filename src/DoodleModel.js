@@ -14,6 +14,7 @@ const DoodleModel = class {
     this.t = 0;
     this.line = [];
     this.notchPoints = [];
+    this.processCircles();
   }
 
   setCircles(circles) {
