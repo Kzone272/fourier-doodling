@@ -78,14 +78,14 @@ const DoodleModel = class {
   }
 
   reset() {
-    // We don't want to replace the arrays themselves
-    // because that will break data binding
-    this.line.length = 0;
-    this.randomizeCircles();
     this.t = 0;
+    this.line = [];
+    this.randomizeCircles();
   }
 
   randomizeCircles() {
+    // We don't want to replace the arrays themselves
+    // because that will break data binding
     this.circles.length = 0;
     this.circles.push(...generateCircles());
   }
@@ -190,7 +190,13 @@ const SvgRenderer = class {
 
     this.linePath = this.svgContainer
       .append('path')
-      .classed('line', true)
+      .classed('line', true);
+
+    this.reset();
+  }
+
+  reset() {
+    this.linePath
       .datum(this.doodleModel.line);
 
     this.circles = this.svgContainer.selectAll('circle')
@@ -269,6 +275,7 @@ const Controls = class {
     this.pause();
 
     doodleModel.reset();
+    svgRenderer.reset();
 
     this.resume();
   }
