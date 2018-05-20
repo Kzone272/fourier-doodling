@@ -12,13 +12,19 @@ svg {
 }
 
 .line {
+  fill: none;
   stroke-width: 2;
   stroke: #07f;
-  fill: none
 }
 
 .circle {
   fill: none;
   stroke-width: 2;
-  stroke: #aaa;
+  stroke: rgba(150, 150, 150, 0.5);
+}
+
+.notch {
+  fill: none;
+  stroke-width: 2;
+  stroke: #e99;
 }

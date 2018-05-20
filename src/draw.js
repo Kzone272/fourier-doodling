@@ -80,6 +80,7 @@ const DoodleModel = class {
   reset() {
     this.t = 0;
     this.line = [];
+    this.notchPoints = [];
     this.randomizeCircles();
   }
 
@@ -97,12 +98,15 @@ const DoodleModel = class {
   }
 
   processCircles() {
+    this.notchPoints = [];
     let x = this.startX;
     let y = this.startY;
     this.circles.forEach((circle) => {
       Object.assign(circle, { x, y });
+      this.notchPoints.push([x, y]);
       x += circle.radius * Math.cos(circle.rotation);
       y += circle.radius * Math.sin(circle.rotation);
+      this.notchPoints.push([x, y]);
       Object.assign(circle, { anchorX: x, anchorY: y });
       circle.rotation = this.t * circle.period * this.speed;
     });
@@ -192,13 +196,18 @@ const SvgRenderer = class {
       .append('path')
       .classed('line', true);
 
+    this.notchFunction = d3.line()
+      .x(d => d[0])
+      .y(d => d[1]);
+
+    this.notchPath = this.svgContainer
+      .append('path')
+      .classed('notch', true);
+
     this.reset();
   }
 
   reset() {
-    this.linePath
-      .datum(this.doodleModel.line);
-
     this.circles = this.svgContainer.selectAll('circle')
       .data(this.doodleModel.circles);
 
@@ -214,6 +223,7 @@ const SvgRenderer = class {
   drawFrame() {
     this.drawCircles();
     this.drawLine();
+    this.drawNotches();
   }
 
   drawCircles() {
@@ -223,9 +233,14 @@ const SvgRenderer = class {
       .attr('r', d => d.radius);
   }
 
+  drawNotches() {
+    this.notchPath
+      .attr('d', this.notchFunction(this.doodleModel.notchPoints));
+  }
+
   drawLine() {
     this.linePath
-      .attr('d', this.lineFunction);
+      .attr('d', this.lineFunction(this.doodleModel.line));
   }
 };
 
