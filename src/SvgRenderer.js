@@ -19,24 +19,39 @@ const SvgRenderer = class {
       .x(d => d[0])
       .y(d => d[1]);
 
-    this.notchPath = this.svgContainer
+    this.xNotch = this.svgContainer
       .append('path')
-      .classed('notch', true);
+      .classed('notch', true)
+      .classed('x-notch', true);
+    this.yNotch = this.svgContainer
+      .append('path')
+      .classed('notch', true)
+      .classed('y-notch', true);
 
     this.reset();
   }
 
   reset() {
-    this.circles = this.svgContainer.selectAll('circle')
-      .data(this.doodleModel.circles);
+    this.xCircles = this.svgContainer.selectAll('.x-circle')
+      .data(this.doodleModel.x.circles);
+    this.yCircles = this.svgContainer.selectAll('.y-circle')
+      .data(this.doodleModel.y.circles);
 
-    this.circles.exit()
+    this.xCircles.exit()
+      .remove();
+    this.yCircles.exit()
       .remove();
 
-    this.circles = this.circles.enter()
+    this.xCircles = this.xCircles.enter()
       .append('circle')
       .classed('circle', true)
-      .merge(this.circles);
+      .classed('x-circle', true)
+      .merge(this.xCircles);
+    this.yCircles = this.yCircles.enter()
+      .append('circle')
+      .classed('circle', true)
+      .classed('y-circle', true)
+      .merge(this.yCircles);
   }
 
   drawFrame() {
@@ -46,15 +61,21 @@ const SvgRenderer = class {
   }
 
   drawCircles() {
-    this.circles
+    this.xCircles
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y)
+      .attr('r', d => d.radius);
+    this.yCircles
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
       .attr('r', d => d.radius);
   }
 
   drawNotches() {
-    this.notchPath
-      .attr('d', this.notchFunction(this.doodleModel.notch));
+    this.xNotch
+      .attr('d', this.notchFunction(this.doodleModel.x.notch));
+    this.yNotch
+      .attr('d', this.notchFunction(this.doodleModel.y.notch));
   }
 
   drawLine() {

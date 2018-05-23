@@ -6,7 +6,8 @@ function makeRandomCircles(n) {
     array.push({
       radius: 10 * (Math.random() * 3 + 1),
       rotation: 0,
-      period: Math.random() * n,
+      offset: 0,
+      frequency: Math.random() * n,
       x: 0,
       y: 0,
     });
@@ -20,7 +21,8 @@ function makeOrderedCircles(n) {
     array.push({
       radius: 10 * (n + 2 - i),
       rotation: 0,
-      period: i + 1,
+      offset: 0,
+      frequency: i + 1,
       x: 0,
       y: 0,
     });
@@ -28,17 +30,19 @@ function makeOrderedCircles(n) {
   return array;
 }
 
-function makeSquareCircles(n) {
+function makeSquareCircles(n, offset = 0) {
   const array = [];
   for (let i = 0; i < n; i++) {
     array.push({
       radius: 50 / (2 * i + 1),
-      rotation: 0,
-      period: 2 * i + 1,
+      rotation: offset,
+      offset,
+      frequency: 2 * i + 1,
       x: 0,
       y: 0,
     });
   }
+
   return array;
 }
 
@@ -54,10 +58,13 @@ function makeCircles(method = 'square', n = 50) {
     case 'square':
       array = makeSquareCircles(n);
       break;
+    case 'squareX':
+      array = makeSquareCircles(n, Math.PI / 2);
+      break;
     default:
       array = [];
   }
-  return sortBy(array, 'period');
+  return sortBy(array, 'frequency');
 }
 
 export default makeCircles;

@@ -3,7 +3,10 @@ import SvgRenderer from './SvgRenderer';
 import makeCircles from './makeCircles';
 
 const doodleModel = new DoodleModel();
-doodleModel.setCircles(makeCircles('square', 50));
+doodleModel.setCircleSet({
+  x: makeCircles('squareX', 5),
+  y: makeCircles('square', 5),
+});
 
 const svgRenderer = new SvgRenderer('svg', doodleModel);
 
@@ -50,12 +53,18 @@ const Controls = class {
   }
 
   randomize() {
-    doodleModel.setCircles(makeCircles('random', 5));
+    doodleModel.setCircleSet({
+      x: makeCircles('random', 5),
+      y: makeCircles('random', 5),
+    });
     this.restart();
   }
 
   square() {
-    doodleModel.setCircles(makeCircles('square', 50));
+    doodleModel.setCircleSet({
+      x: makeCircles('squareX', 50),
+      y: makeCircles('square', 50),
+    });
     this.restart();
   }
 };
