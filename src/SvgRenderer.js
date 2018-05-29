@@ -11,6 +11,14 @@ const SvgRenderer = class {
       .y(d => d[1])
       .curve(d3.curveCatmullRom.alpha(0.5));
 
+    // this.svgContainer
+    //   .append('svg')
+    //   .attr('x', 82)
+    //   .attr('y', 210)
+    //   .append('path')
+    //   .classed('signature', true)
+    //   .attr('d', this.lineFunction(this.doodleModel.sigPoints));
+
     this.linePath = this.svgContainer
       .append('path')
       .classed('line', true);
@@ -29,13 +37,53 @@ const SvgRenderer = class {
       .classed('y-notch', true);
 
     this.reset();
+
+    // const { length } = this.doodleModel.sigPoints;
+    // const scale = 400 / length;
+    // const sigX = this.doodleModel.sigPoints.map(([x, y], i) => [i * scale, x + 400]);
+    // const sigY = this.doodleModel.sigPoints.map(([x, y], i) => [i * scale + 400, y + 400]);
+
+    // this.svgContainer
+    //   .append('path')
+    //   .classed('signature', true)
+    //   .attr('d', this.lineFunction(sigX));
+    // this.svgContainer
+    //   .append('path')
+    //   .classed('signature', true)
+    //   .attr('d', this.lineFunction(sigY));
+
+
+    // const xFourier = [];
+    // for (let i = 0; i < length; i++) {
+    //   let y = 400;
+    //   this.doodleModel.x.circles.forEach((circle) => {
+    //     y += circle.radius * Math.sin((i / length * (100 / 16)) * circle.frequency + circle.offset);
+    //   });
+    //   xFourier.push([i * scale, y]);
+    // }
+    // const yFourier = [];
+    // for (let i = 0; i < length; i++) {
+    //   let y = 400;
+    //   this.doodleModel.y.circles.forEach((circle) => {
+    //     y += circle.radius * Math.sin((i / length * (100 / 16)) * circle.frequency + circle.offset);
+    //   });
+    //   yFourier.push([i * scale + 400, y]);
+    // }
+    // this.svgContainer
+    //   .append('path')
+    //   .classed('fourier', true)
+    //   .attr('d', this.lineFunction(xFourier));
+    // this.svgContainer
+    //   .append('path')
+    //   .classed('fourier', true)
+    //   .attr('d', this.lineFunction(yFourier));
   }
 
   reset() {
     this.xCircles = this.svgContainer.selectAll('.x-circle')
-      .data(this.doodleModel.x.circles);
+      .data(this.doodleModel.x.circles.filter(circle => circle.radius > 1));
     this.yCircles = this.svgContainer.selectAll('.y-circle')
-      .data(this.doodleModel.y.circles);
+      .data(this.doodleModel.y.circles.filter(circle => circle.radius > 1));
 
     this.xCircles.exit()
       .remove();

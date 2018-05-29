@@ -13,7 +13,7 @@ svg {
 
 .line {
   fill: none;
-  stroke-width: 2;
+  stroke-width: 4;
   stroke: #07f;
 }
 
@@ -27,4 +27,16 @@ svg {
   fill: none;
   stroke-width: 2;
   stroke: #e99;
+}
+
+.signature {
+  fill: none;
+  stroke-width: 2;
+  stroke: red;
+}
+
+.fourier {
+  fill: none;
+  stroke-width: 2;
+  stroke: forestgreen;
 }

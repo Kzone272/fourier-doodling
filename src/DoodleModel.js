@@ -1,19 +1,17 @@
 const DoodleModel = class {
   constructor() {
-    this.speed = 0.015;
-    this.startX = 250;
-    this.startY = 250;
+    this.speed = 0.02;
     this.line = [];
-    this.maxLineLength = 400;
+    this.maxLineLength = 300;
     this.x = {
       circles: [],
-      startX: 250,
-      startY: 50,
+      startX: 400,
+      startY: 100,
     };
     this.y = {
       circles: [],
-      startX: 50,
-      startY: 250,
+      startX: 100,
+      startY: 400,
     };
 
     this.reset();
@@ -53,8 +51,8 @@ const DoodleModel = class {
     circleInfo.circles.forEach((circle) => {
       Object.assign(circle, { x, y });
       circleInfo.notch.push([x, y]);
-      circle.rotation = (this.t * this.speed + circle.offset) * circle.frequency + circle.offset;
-      x += circle.radius * Math.cos(circle.rotation);
+      circle.rotation = (this.t * this.speed) * circle.frequency + circle.offset;
+      x += circle.radius * Math.sin(circle.rotation);
       y += circle.radius * Math.sin(circle.rotation);
       circleInfo.notch.push([x, y]);
       Object.assign(circle, { anchorX: x, anchorY: y });

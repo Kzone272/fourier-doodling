@@ -8,5 +8,6 @@ module.exports = {
     'object-curly-newline': 'off',
     'no-plusplus': 'off',
     'no-param-reassign': 'off',
+    'no-continue': 'off',
   },
 };
