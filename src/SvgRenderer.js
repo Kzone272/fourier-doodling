@@ -80,10 +80,14 @@ const SvgRenderer = class {
   }
 
   reset() {
+    const xCircles = this.doodleModel.x.circles.filter(circle => circle.radius > 1);
+    console.log('filtered x circles length', xCircles.length);
     this.xCircles = this.svgContainer.selectAll('.x-circle')
-      .data(this.doodleModel.x.circles.filter(circle => circle.radius > 1));
+      .data(xCircles);
+    const yCircles = this.doodleModel.y.circles.filter(circle => circle.radius > 1);
+    console.log('filtered y circles length', yCircles.length);
     this.yCircles = this.svgContainer.selectAll('.y-circle')
-      .data(this.doodleModel.y.circles.filter(circle => circle.radius > 1));
+      .data(yCircles);
 
     this.xCircles.exit()
       .remove();
